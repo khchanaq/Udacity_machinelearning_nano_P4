@@ -24,10 +24,7 @@ class LearningAgent(Agent):
         ###########
         # Set any additional class parameters as needed
         self.next_actions = None
-        #self.Qtable = {}
-        self.time = 0
-        self.initial_epsilon = epsilon * 1.0
-
+  
 
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
@@ -47,8 +44,8 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
         else:
-            self.time += 1
-            self.epsilon = self.initial_epsilon / (self.time ** 2)
+            self.epsilon = 0.999 * self.epsilon
+    
             #self.epsilon -= 0.05
             
 
@@ -85,9 +82,8 @@ class LearningAgent(Agent):
 
         for action in self.valid_actions:
             curQ = self.get_Qvalue(state, action)
-            if maxQ is None or curQ > maxQ:
+            if maxQ is None or curQ >= maxQ:
                 maxQ = curQ
-                self.next_actions = action
 
         return maxQ 
 
@@ -131,25 +127,26 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # When not learning, choose a random action
-        if self.learning == False or self.epsilon > 0.0035:
-            if self.get_maxQ(state) > 0:
-                action = self.next_actions
-            elif self.get_Qvalue(state, self.planner.next_waypoint()) == 0:
-                action = self.planner.next_waypoint()
-                print "WAYYYYYPOINT"
-            else:
-                valid_actions_exceptNextWay = self.valid_actions[:]
-                valid_actions_exceptNextWay.remove(self.planner.next_waypoint())
-                action = random.choice(valid_actions_exceptNextWay)
-                print "RANDOM" + str(action)
-            
+        if self.learning == False:
+            action = random.choice(self.valid_actions)
+            #if self.get_maxQ(state) > 0:
+            #    action = self.best_action(state)
+            #if self.get_Qvalue(state, self.planner.next_waypoint()) == 0:
+            #    action = self.planner.next_waypoint()
+            #    print "WAYYYYYPOINT"
+        
+            #else:
+            #    valid_actions_exceptNextWay = self.valid_actions[:]
+            #    valid_actions_exceptNextWay.remove(self.planner.next_waypoint())
+            #    action = random.choice(valid_actions_exceptNextWay)
+            #    print "RANDOM" + str(action)
+   
                 
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
         else:
         #    if self.epsilon == 0: 
-                self.get_maxQ(state)
-                action = self.next_actions
+                action = self.best_action(state)
         #    else:
         #        action = random.choice(self.valid_actions)
         #        for actions in self.valid_actions:
@@ -158,6 +155,18 @@ class LearningAgent(Agent):
     
     
         return action
+
+    def best_action(self, state):
+        
+        PossbileAction = self.find_key(self.Q.get(state), self.get_maxQ(state))
+        action = random.choice(PossbileAction)
+        
+        return action
+        
+
+    def find_key(self, input_dict, value):
+        
+        return [k for k,v in input_dict.iteritems() if v == value]
 
 
     def learn(self, state, action, reward):
@@ -197,7 +206,7 @@ def run():
 
 #    alphalist =  [0.1,  0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9]
 #   epilsonlist = [0.1,  0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9]
-    alphalist = [0.9]
+    alphalist = [0.5]
     epilsonlist = [1.0]
     for i in range(0, len(alphalist)):
         for j in range(0, len(epilsonlist)):
@@ -231,14 +240,14 @@ def run():
             #   display      - set to False to disable the GUI if PyGame is enabled
             #   log_metrics  - set to True to log trial and simulation results to /logs
             #   optimized    - set to True to change the default log file name
-            sim = Simulator(env, update_delay = 0.01, log_metrics = True, optimized = False)#, testround = i*len(epilsonlist) + j)
+            sim = Simulator(env, update_delay = 0.01, log_metrics = True, optimized = True)#, testround = i*len(epilsonlist) + j)
             
             ##############
             # Run the simulator
             # Flags:
             #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
             #   n_test     - discrete number of testing trials to perform, default is 0
-            sim.run(n_test = 10, tolerance = 0.0035)
+            sim.run(n_test = 200, tolerance = 0.07)
 
 
 if __name__ == '__main__':

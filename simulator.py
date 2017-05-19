@@ -130,11 +130,12 @@ class Simulator(object):
         trial = 1
 
         while True:
-
+            print "Now is Trial: " + str(total_trials)
             # Flip testing switch
             if not testing:
                 if total_trials > 20: # Must complete minimum 20 training trials
                     if a.learning:
+                        print "Now is Epsilon: " + str (a.epsilon)
                         if a.epsilon < tolerance: # assumes epsilon decays to 0
                             testing = True
                             trial = 1
