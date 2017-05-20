@@ -129,23 +129,15 @@ class LearningAgent(Agent):
         # When not learning, choose a random action
         if self.learning == False:
             action = random.choice(self.valid_actions)
-            #if self.get_maxQ(state) > 0:
-            #    action = self.best_action(state)
-            #if self.get_Qvalue(state, self.planner.next_waypoint()) == 0:
-            #    action = self.planner.next_waypoint()
-            #    print "WAYYYYYPOINT"
-        
-            #else:
-            #    valid_actions_exceptNextWay = self.valid_actions[:]
-            #    valid_actions_exceptNextWay.remove(self.planner.next_waypoint())
-            #    action = random.choice(valid_actions_exceptNextWay)
-            #    print "RANDOM" + str(action)
-   
-                
-        # When learning, choose a random action with 'epsilon' probability
-        #   Otherwise, choose an action with the highest Q-value for the current state
         else:
-        #    if self.epsilon == 0: 
+            if random.random() < self.epsilon:
+                other_actions = self.valid_actions[:]
+                if self.get_maxQ(state) != 0.0:
+                    for i in self.find_key(self.Q.get(state), self.get_maxQ(state)):
+                        other_actions.remove(i)
+                
+                action = random.choice(other_actions)
+            else:
                 action = self.best_action(state)
         #    else:
         #        action = random.choice(self.valid_actions)
@@ -206,7 +198,7 @@ def run():
 
 #    alphalist =  [0.1,  0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9]
 #   epilsonlist = [0.1,  0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9]
-    alphalist = [0.5]
+    alphalist = [0.9]
     epilsonlist = [1.0]
     for i in range(0, len(alphalist)):
         for j in range(0, len(epilsonlist)):
