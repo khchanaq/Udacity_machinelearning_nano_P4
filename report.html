@@ -16515,7 +16515,17 @@ QmCC
 <pre><code>- forward : -8.90
 - None : 2.52
 - right : -0.13
-- left : -36.19</code></pre>
+- left : -36.19
+
+</code></pre>
+<p>There are only a few example which the agent undergo suboptimal condition such as example below: &lt;/br&gt;
+Supposed forward should be the most optimal scenario however due to limited round of exploration, forward is never being executed while after epilson lower than tolerance, we will pick turn right which at least avoid accident but slower the reliablility , which makes it an A instead of A+ like safety.
+('forward', 'green', 'right', 'left', 'right')</p>
+
+<pre><code> - forward : 0.00
+ - None : 0.00
+ - right : 0.35
+ - left : 0.00</code></pre>
 
 </div>
 </div>
